@@ -1,6 +1,7 @@
 import pandas as pd 
 import numpy as np
 import math
+import glob
 import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
@@ -8,9 +9,6 @@ import torch
 import torch.nn.functional as F
 import torch.nn as nn
 from sklearn.model_selection import train_test_split
-import pandas as pd
-import glob
-
 
 def f(path,x):
     
@@ -36,27 +34,39 @@ data3=data3.append(data4)
 data2=data2.append(data3)
 data=data1.append(data2)
 
+#data6=f("/content/hin1",0)
+#data7=f("/content/asm1",2)
 
+#data8=data7.append(data6)
 Y=np.asarray(data["class"])
 X=np.asarray(data.drop("class",axis=1))
-print(type(X))
-X_train, X_test, Y_train, Y_test = train_test_split(X,Y,test_size=0.3,random_state=0)
-X_train, Y_train, X_test, Y_test = map(torch.tensor, (X_train, Y_train, X_test, Y_test))
-
+#Y1=np.asarray(data6["class"])
+#X1=np.asarray(data6.drop("class",axis=1))
+#print(type(X))
+#X_train, X_test, Y_train, Y_test = train_test_split(X,Y,test_size=0.3,random_state=0)
+#X_train, Y_train, X_test, Y_test = map(torch.tensor, (X_train, Y_train, X_test, Y_test))
+X,Y=map(torch.tensor,(X,Y))
+#X1,Y1=map(torch.tensor,(X1,Y1))
 
 def accuracy(y_hat, y):
   pred = torch.argmax(y_hat, dim=1)
   return (pred == y).float().mean()
 
 
-def fit(epochs = 100, learning_rate = 1):
+def fit(epochs = 1000, learning_rate = 0.1):
   loss_arr = []
   acc_arr = []
   for epoch in range(epochs):
-    y_hat = fn(X_train)
-    loss = F.cross_entropy(y_hat, Y_train)
+   # y_hat = fn(X_train)
+   # loss = F.cross_entropy(y_hat, Y_train)
+    #loss_arr.append(loss.item())
+    #acc_arr.append(accuracy(y_hat, Y_train))
+    #y_hat = fn(X_train)
+    y_hat = fn(X)
+    
+    loss = F.cross_entropy(y_hat, Y)
     loss_arr.append(loss.item())
-    acc_arr.append(accuracy(y_hat, Y_train))
+    acc_arr.append(accuracy(y_hat, Y))
 
     loss.backward()
     with torch.no_grad():
@@ -67,7 +77,7 @@ def fit(epochs = 100, learning_rate = 1):
   plt.plot(loss_arr, 'r-')
   plt.plot(acc_arr, 'b-')
   plt.show()      
-  print('Loss before training', loss_arr[0])
+  print('acurracy', acc_arr[-1])
   print('Loss after training', loss_arr[-1])
 
 class FirstNetwork(nn.Module):
@@ -93,3 +103,8 @@ class FirstNetwork(nn.Module):
 
 fn = FirstNetwork()
 fit()
+
+#y1=fn(X1)
+#acc=accuracy(y1,Y1)
+#print(acc)
+
